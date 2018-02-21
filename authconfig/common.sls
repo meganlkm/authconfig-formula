@@ -1,14 +1,9 @@
 {% from "authconfig/map.jinja" import authconfig with context %}
+{% from "authconfig/map.jinja" import is_test %}
 {% from "authconfig/secrets.sls" import pass %}
 {% do authconfig.update({ 'sssd_pass': pass }) %}
 
-{% set vm_flag = False %}
-{% if ((grains['virtual'] != 'bhyve' and 'virtual_subtype' not in grains) or
-       (grains.get('virtual_subtype') and grains.get('virtual_subtype') != 'Docker')) %}
-  {% set vm_flag = True %}
-{% endif %}
-
-{% if vm_flag %}
+{% if not is_test %}
 update_hosts:
   file.line:
     - name: /etc/hosts
@@ -29,7 +24,7 @@ copy_sssd_conf:
     - source: salt://authconfig/files/sssd.conf
     - template: jinja
     - mode: 0600
-{% if vm_flag %}
+{% if not is_test %}
     - watch_in:
       - service: sssd_service
 {% endif %}
@@ -43,7 +38,7 @@ hash_authconfig_bind_pass:
     - shell: {{ grains.shell if 'shell' in grains else '/bin/bash' }}
 {% endif %}
 
-{% if vm_flag %}
+{% if not is_test %}
 sssd_service:
   service.running:
     - name: sssd
@@ -56,7 +51,7 @@ copy_access_conf:
     - source: salt://authconfig/files/access.conf
     - template: jinja
 
-{% if vm_flag %}
+{% if not is_test %}
 sshd_service:
   service.running:
     - name: sshd
@@ -75,7 +70,7 @@ fix_banner:
     - repl: 'Banner /etc/ssh/issue\n'
     - pattern: or
         ^#Banner.*
-{% if vm_flag %}
+{% if not is_test %}
     - watch_in:
       - service: sshd_service
 {% endif %}
@@ -86,12 +81,12 @@ password_auth_yes_add:
     - repl: 'PasswordAuthentication yes\n'
     - pattern: or
         ^#PasswordAuthentication.*
-{% if vm_flag %}
+{% if not is_test %}
     - watch_in:
       - service: sshd_service
 {% endif %}
 
-{% if vm_flag %}
+{% if not is_test %}
 restart_authconfig:
   service.running:
     - name: sssd
