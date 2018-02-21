@@ -2,9 +2,7 @@
 set -ev
 
 test -z $1 && echo "Usage: ${0} OS_ID" && exit 1
-
 export OS_ID=$1
-
 cd ..
 
 # salt state.apply all tests

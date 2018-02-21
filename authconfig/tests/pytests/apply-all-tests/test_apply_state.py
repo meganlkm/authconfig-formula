@@ -4,7 +4,7 @@ from subprocess import check_output
 
 class ApplyStateTest(TestCase):
 
-    def test_apply(self):
+    def test_000_apply(self):
         state_apply_response = check_output(["salt-call", "--local", "state.apply"]).split('\n')
         summary = state_apply_response[-8:]
         failed = 0

@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 from subprocess import check_output
 
@@ -12,3 +13,9 @@ class ApplyDiscoveryTest(TestCase):
             if line.startswith('Failed:'):
                 failed = int(line.split(':').pop().strip())
         self.assertEqual(failed, 0)
+
+    def test_001_srvlookup_exists(self):
+        self.assertTrue(os.path.isdir('/var/tmp/srvlookup'))
+
+    def test_002_dclocator_exists(self):
+        self.assertTrue(os.path.isfile('/var/tmp/dclocator.py'))
