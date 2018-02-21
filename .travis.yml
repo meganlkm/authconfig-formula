@@ -30,7 +30,7 @@ before_install:
 
 install:
 - cd "${TRAVIS_BUILD_DIR}/authconfig"
-- docker build --force-rm -t "authconfig:salt-state-testing-${OS_ID}" -f "tests/Dockerfile.${OS_ID}" .
+- docker build --force-rm -t "authconfig:salt-testing-${OS_ID}" -f "tests/Dockerfile.${OS_ID}" .
 
 script:
 - cd "${TRAVIS_BUILD_DIR}/authconfig/tests"

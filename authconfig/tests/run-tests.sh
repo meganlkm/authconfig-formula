@@ -7,18 +7,18 @@ export OS_ID=$1
 
 cd ..
 
-# # salt state.apply all tests
-# docker run --rm \
-#   -v $(pwd)/tests/pytests/apply-all-tests:/opt/tests \
-#   -h "salt-state-testing-${OS_ID}" \
-#   --name "salt-state-testing-${OS_ID}" \
-#   -it authconfig:"salt-state-testing-${OS_ID}" \
-#   pytest -s /opt/tests
+# salt state.apply all tests
+docker run --rm \
+  -v $(pwd)/tests/pytests/apply-all-tests:/opt/tests \
+  -h "salt-testing-${OS_ID}" \
+  --name "salt-testing-${OS_ID}" \
+  -it authconfig:"salt-testing-${OS_ID}" \
+  pytest -s /opt/tests
 
 # salt state.apply single sls
 docker run --rm \
   -v $(pwd)/tests/pytests/apply-single-sls-tests:/opt/tests \
-  -h "salt-state-testing-${OS_ID}" \
-  --name "salt-state-testing-${OS_ID}" \
-  -it authconfig:"salt-state-testing-${OS_ID}" \
+  -h "salt-testing-${OS_ID}" \
+  --name "salt-testing-${OS_ID}" \
+  -it authconfig:"salt-testing-${OS_ID}" \
   pytest -s /opt/tests
