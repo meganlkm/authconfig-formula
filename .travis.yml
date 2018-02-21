@@ -25,10 +25,13 @@ services:
 - docker
 
 before_install:
-- cd authconfig && pip install Jinja2 && python tests/filltmpl.py ${OS_ID}
+- pip install Jinja2
+- python ${TRAVIS_BUILD_DIR}/authconfig/tests/filltmpl.py ${OS_ID}
 
 install:
-- docker build --force-rm -t "authconfig:salt-state-testing-${OS_ID}" -f "tests/Dockerfile.${OS_ID}" .
+- cd "${TRAVIS_BUILD_DIR}/authconfig"
+- docker build --force-rm -t "authconfig:salt-testing-${OS_ID}" -f "tests/Dockerfile.${OS_ID}" .
 
 script:
-- cd tests && ./run-tests.sh ${OS_ID}
+- cd "${TRAVIS_BUILD_DIR}/authconfig/tests"
+- ./run-tests.sh ${OS_ID}
