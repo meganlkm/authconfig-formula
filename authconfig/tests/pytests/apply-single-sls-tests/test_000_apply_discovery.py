@@ -1,6 +1,6 @@
 import os
-from unittest import TestCase
 from subprocess import check_output
+from unittest import TestCase
 
 
 class ApplyDiscoveryTest(TestCase):

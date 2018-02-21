@@ -11,3 +11,9 @@
   base = 'authconfig',
 )
 %}
+
+{% set stage_name = salt['environ.get']('STAGE') %}
+{% set is_test = False %}
+{% if stage_name == 'TEST' %}
+  {% set is_test = True %}
+{% endif %}

@@ -1,4 +1,5 @@
 {% from "authconfig/map.jinja" import authconfig with context %}
+{% from "authconfig/map.jinja" import is_test %}
 {% from "authconfig/krbdchost.sls" import url %}
 {% from "authconfig/secrets.sls" import pass %}
 {% from "authconfig/secrets.sls" import name %}
@@ -6,21 +7,21 @@
 {% do authconfig.update({'sssd_pass': pass}) %}
 {% do authconfig.update({'sssd_name': name}) %}
 
-{% set vm_flag = False %}
-{% if ((grains['virtual'] != 'bhyve' and 'virtual_subtype' not in grains) or
-       (grains.get('virtual_subtype') and grains.get('virtual_subtype') != 'Docker')) %}
-  {% set vm_flag = True %}
-{% endif %}
+debug_thing:
+  cmd.run:
+    - name: "echo {{ is_test }}"
 
 install_prereqs:
   pkg.installed:
     - pkgs: {{ authconfig.packages }}
       refresh: True
 
+{% if not is_test %}
 join_domain:
   cmd.run:
     - name: echo -n {{ authconfig.sssd_pass }} | adcli join --stdin-password --domain-ou={{ authconfig.computer_ou }} --login-user={{ authconfig.sssd_name }} {{ authconfig.domain }}
     - creates: /etc/krb5.keytab
+{% endif %}
 
 copy_ntp_conf:
   file.managed:
@@ -28,7 +29,7 @@ copy_ntp_conf:
     - source: salt://authconfig/files/ntp.conf
     - template: jinja
 
-{% if vm_flag %}
+{% if not is_test %}
 ntp_service:
   service.running:
     - name: ntp
@@ -39,9 +40,9 @@ ntp_service:
 
 copy_nsswitch_conf:
   file.managed:
-        - name: /etc/nsswitch.conf
-        - source: salt://authconfig/files/nsswitch.conf
-        - template: jinja
+    - name: /etc/nsswitch.conf
+    - source: salt://authconfig/files/nsswitch.conf
+    - template: jinja
 
 nsswitch_passwd:
   file.replace:
@@ -90,7 +91,7 @@ copy_samba_conf:
     - source: salt://authconfig/files/smb.conf
     - template: jinja
 
-{% if vm_flag %}
+{% if not is_test %}
 samba_service:
   service.running:
     - name: smb
@@ -99,7 +100,7 @@ samba_service:
       - file: /etc/samba/smb.conf
 {% endif %}
 
-{% if vm_flag %}
+{% if not is_test %}
 nmbd_service:
   service.running:
     - name: nmbd

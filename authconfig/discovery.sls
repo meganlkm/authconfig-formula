@@ -10,29 +10,15 @@ srvlookup_extract-dirs:
     - require_in:
       - srvlookup_package_install
 
-{%- if authconfig.discovery.hashsum %}
-   # Check local archive using hashstring for older Salt.
-   # (see https://github.com/saltstack/salt/pull/41914).
-  {%- if grains['saltversioninfo'] <= [2016, 11, 6] %}
-srvlookup_archive_hash:
-   module.run:
-     - name: file.check_hash
-     - path: salt://authconfig/files/{{ authconfig.discovery.archive_name }}
-     - file_hash: {{ authconfig.discovery.hashsum }}
-     - require_in:
-       - srvlookup_package_install
-  {%- endif %}
-{%- endif %}
-
 srvlookup_package_install:
   archive.extracted:
     - name: {{ authconfig.discovery.tmpdir }}
     - source: salt://authconfig/files/{{ authconfig.discovery.archive_name }}
     - archive_format: {{ authconfig.discovery.archive_type }}
     - enforce_toplevel: False
-       {%- if authconfig.discovery.hashsum and grains['saltversioninfo'] > [2016, 11, 6] %}
+  {%- if authconfig.discovery.hashsum and grains['saltversioninfo'] > [2016, 11, 6] %}
     - source_hash: {{ authconfig.discovery.hashsum }}
-       {%- endif %}
+  {%- endif %}
     - trim_output: 5
     - if_missing: {{ authconfig.discovery.tmpdir }}/{{ authconfig.discovery.archive_name }}
 
