@@ -17,7 +17,14 @@ See the full Salt Formulas installation and usage instructions
 
 The ***Makefile*** is located in the project base directory.
 
-* start a virtualenv
+#### Start a virtualenv
+
+```bash
+pip install -U virtualenv
+virtualenv .venv
+source .venv/bin/activate
+```
+
 * install requirements: `make test-setup`
 * run a test:
   - `make test_centos_master_2017.7.2`
