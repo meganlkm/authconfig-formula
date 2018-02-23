@@ -3,5 +3,7 @@
 *.py[cod]
 .env
 .pytest_cache/
-authconfig/tests/Dockerfile*
+__pycache__/
+Dockerfile.*_*
 ignore/
+tmp/

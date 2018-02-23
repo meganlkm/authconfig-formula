@@ -1,21 +1,21 @@
+FORMULA_NAME = "authconfig"
 PWD = $(shell pwd)
 
 # ---------------------------------------------------------------
 define render_dockerfile
-	python $(PWD)/authconfig/tests/filltmpl.py $(1)
+	python $(PWD)/tools/filltmpl.py $(FORMULA_NAME) $(1)
 endef
 
 define docker_build
-	cd $(PWD)/authconfig && \
-	  docker build --force-rm -t authconfig:salt-testing-$(1) -t authconfig:local-salt-testing-$(1) -f tests/Dockerfile.$(1) .
+	docker build --force-rm -t $(FORMULA_NAME):salt-testing-$(1) -f Dockerfile.$(1) .
 endef
 
 define docker_run_local
-	docker run --rm -v $(PWD)/authconfig:/opt/authconfig --env=STAGE=TEST -h local-salt-testing-$(1) --name local-salt-testing-$(1) -it authconfig:local-salt-testing-$(1) /bin/bash
+	docker run --rm -v $(PWD):/opt/$(FORMULA_NAME)-formula --env=STAGE=TEST -h salt-testing-$(1) --name salt-testing-$(1) -it $(FORMULA_NAME):salt-testing-$(1) /bin/bash
 endef
 
 define run_tests
-	cd $(PWD)/authconfig/tests && ./run-tests.sh $(1)
+	./tools/run-tests.sh $(FORMULA_NAME) $(1)
 endef
 
 # --- convenience functions -------------------------------------
@@ -32,18 +32,16 @@ define run_local
 endef
 
 # ---------------------------------------------------------------
-test-setup:
+setup:
 	pip install Jinja2
 
 clean:
 	find . -name '*.pyc' -exec rm '{}' ';'
-	rm -rf authconfig/tests/Dockerfile*
-	rm -rf authconfig/tests/pytests/.pytest_cache
-	rm -rf authconfig/tests/pytests/__pycache__
-	rm -rf authconfig/tests/pytests/apply-all-tests/.pytest_cache
-	rm -rf authconfig/tests/pytests/apply-all-tests/__pycache__
-	rm -rf authconfig/tests/pytests/apply-single-sls-tests/.pytest_cache
-	rm -rf authconfig/tests/pytests/apply-single-sls-tests/__pycache__
+	rm -rf Dockerfile.*
+	rm -rf tests/pytests/apply-all-tests/.pytest_cache
+	rm -rf tests/pytests/apply-all-tests/__pycache__
+	rm -rf tests/pytests/apply-single-sls-tests/.pytest_cache
+	rm -rf tests/pytests/apply-single-sls-tests/__pycache__
 
 # --- centos_master_2017.7.2 ------------------------------------
 test-centos_master_2017.7.2: clean
